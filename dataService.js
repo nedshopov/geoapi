@@ -5,6 +5,7 @@ const dbConfigJson = require("./dbConfig.json")
 class DataService {
     constructor() {
         this.dbConfig = dbConfigJson
+        this.getFirstResult = (result) => { return result[0] }
         this.pool = mysql.createPool({
             connectionLimit: this.dbConfig.connectionLimit,
             host: this.dbConfig.host,
@@ -28,7 +29,11 @@ class DataService {
             .from(this.dbConfig.geoObjectsTable)
             .where({ id: id })
             .build()
-        this.usePoolQuery(res, query)
+        this.usePoolQuery(res, query, this.getFirstResult)
+    }
+
+    getInRange(res, lat, lng, radius) {
+        this.usePoolQuery(res, `call GETINRADIUS(${lat}, ${lng}, ${radius})`, this.getFirstResult)
     }
 
     useConnection(res, sqlQuery) {
@@ -53,14 +58,19 @@ class DataService {
         })
     }
 
-    usePoolQuery(res, sqlQuery) {
+    usePoolQuery(res, sqlQuery, cleanResult) {
         this.pool.query(sqlQuery, (err, rows) => {
             if (err) {
                 console.log(err)
                 res.json({ "error": true, "message": "Can't establish database connection." + err })
             }
-            const result = rows || "Nothing found"
-            res.json(result)
+
+            if (!rows) {
+                res.json("Nothing found")
+            } else {
+                const result = cleanResult ? cleanResult(JSON.parse(JSON.stringify(rows))) : rows
+                res.json(result)
+            }
         })
     }
 }

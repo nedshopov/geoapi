@@ -17,5 +17,9 @@ app.get('/geoapi/objects/:id', (req, res) => {
     dataService.getById(res, parseInt(req.params.id))
 })
 
+app.get('/geoapi/getInRadius/', (req, res) => {
+    dataService.getInRange(res, parseFloat(req.query.lat), parseFloat(req.query.lng), parseInt(req.query.radius))
+})
+
 app.listen(port, () => console.log(`Listening on port ${port}...`))
 
