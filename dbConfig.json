@@ -1,0 +1,8 @@
+{
+    "dbName": "nedsqdfz_Geography",
+    "geoObjectsTable": "GeoObjects",
+    "host": "localhost",
+    "password": "RHjzA9Z9F3LbYU_",
+    "user": "nedsqdfz_neds",
+    "connectionLimit": 100
+}

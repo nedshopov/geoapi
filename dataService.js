@@ -1,22 +1,34 @@
 const mysql = require("mysql")
+const sql = require("sql-query")
+const dbConfigJson = require("./dbConfig.json")
 
 class DataService {
     constructor() {
+        this.dbConfig = dbConfigJson
         this.pool = mysql.createPool({
-            connectionLimit: 100, //important
-            host: "localhost",
-            user: "nedsqdfz_neds",
-            password: "RHjzA9Z9F3LbYU_",
-            database: "nedsqdfz_Geography"
+            connectionLimit: this.dbConfig.connectionLimit,
+            host: this.dbConfig.host,
+            user: this.dbConfig.user,
+            password: this.dbConfig.password,
+            database: this.dbConfig.dbName
         })
     }
 
     getAll(res) {
-        this.usePoolQuery(res, "select * from GeoObjects")
+        const query = sql.Query()
+            .select()
+            .from(this.dbConfig.geoObjectsTable)
+            .build()
+        this.usePoolQuery(res, query)
     }
 
     getById(res, id) {
-        this.usePoolQuery(res, `select * from GeoObjects WHERE ID = ${id}`)
+        const query = sql.Query()
+            .select()
+            .from(this.dbConfig.geoObjectsTable)
+            .where({ id: id })
+            .build()
+        this.usePoolQuery(res, query)
     }
 
     useConnection(res, sqlQuery) {
@@ -24,20 +36,20 @@ class DataService {
             if (err) {
                 console.log(err)
                 console.log(connection)
-                res.json({ "code": 100, "status": "Can't establish database connection." });
-                return;
+                res.json({ "code": 100, "status": "Can't establish database connection." })
+                return
             }
             connection.query(sqlQuery, (err, rows) => {
-                connection.release();
+                connection.release()
                 if (!err) {
                     const result = rows || "Nothing found"
-                    res.json(result);
+                    res.json(result)
                 }
-            });
+            })
             connection.on('error', (err) => {
-                res.json({ "code": 100, "status": "Error in connection database" });
-                return;
-            });
+                res.json({ "code": 100, "status": "Error in connection database" })
+                return
+            })
         })
     }
 
@@ -45,10 +57,10 @@ class DataService {
         this.pool.query(sqlQuery, (err, rows) => {
             if (err) {
                 console.log(err)
-                res.json({ "error": true, "message": "Can't establish database connection." + err });
+                res.json({ "error": true, "message": "Can't establish database connection." + err })
             }
             const result = rows || "Nothing found"
-            res.json(result);
+            res.json(result)
         })
     }
 }
