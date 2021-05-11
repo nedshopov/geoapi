@@ -1,10 +1,6 @@
 // LIBRARIES
 import { useEffect, useState } from 'react';
-import appwrite from '../../config/appwrite';
 import axios from 'axios';
-
-// DATA
-import data from '../../data/places.json'
 
 // SERVICES
 import mapServices from '../../services/mapServices';

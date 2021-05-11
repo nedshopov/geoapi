@@ -1,7 +1,6 @@
 // LIBRARIES
 import { Route, Switch } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import appwrite from '../../config/appwrite';
 
 // DATA
 
