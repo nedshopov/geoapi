@@ -6,6 +6,7 @@ import axios from 'axios';
 import mapServices from '../../services/mapServices';
 
 // CSS
+import style from './Map.module.css'
 
 // COMPONENTS
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
@@ -16,69 +17,83 @@ const defaultLng = 25.238611;
 
 function Map() {
     const [fetchedPlaces, setFetchedPlaces] = useState([]);
+    const [currentLocation, setCurrentLocation] = useState(null);
+    const [radius, setRadius] = useState(0)
 
+    const proxy = 'https://cors-anywhere.herokuapp.com/';
+    const baseURL = 'https://nedshopov.com/geoapi/';
+
+    const getCurrentLocationHandler = (location) => {
+        setCurrentLocation(location);
+    }
 
     useEffect(() => {
-        // let login = appwrite.account.createSession('me@example.com', 'password');
+        if (currentLocation !== null) {
+            axios
+                .get(proxy + baseURL + `getInRadius`, {
+                    params: {
+                        lat: currentLocation.lat,
+                        lng: currentLocation.lng,
+                        radius
+                    }
+                })
+                .then(res => {
+                    setFetchedPlaces(res.data);
+                })
+                .catch(err => console.log(err))
+        }
 
-        // login.then(function (response) {
-        //   console.log(response); // Success
-        // }, function (error) {
-        //   console.log(error); // Failure
-        // });
-
-        // data.forEach(x => {
-        //   let create = appwrite.database.createDocument(process.env.REACT_APP_APPWRITE_COLLECTION_KEY, x, ['*'], ['*']);
-
-        //   create.then(function (response) {
-        //     console.log(response); // Success
-        //   }, function (error) {
-        //     console.log(error); // Failure
-        //   });
-        // })
-
-        // appwrite.database.listDocuments(process.env.REACT_APP_APPWRITE_COLLECTION_KEY, [], 100)
-        //     .then((places) => {
-        //         setFetchedPlaces(places.documents);
-        //     })
-        //     .catch((err) => {
-        //         console.log(err);
-        //     });
-
-        axios
-            .get('https://cors-anywhere.herokuapp.com/https://nedshopov.com/geoapi/objects/all')
-            .then(res => {
-                console.log(res.data);
-            })
-            .catch(err => console.log(err))
-
-    }, [])
+    }, [currentLocation, radius])
 
     return (
-        <MapContainer center={[defaultLat, defaultLng]} zoom={8} scrollWheelZoom={true}>
-            <TileLayer
-                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+
+        <>
+            <input
+                className={style.radiusInput}
+                type="range"
+                min={0}
+                max={50}
+                placeholder="Set search radius"
+                value={radius}
+                name="radius"
+                id="radius"
+                onChange={(e) => {
+                    setRadius(e.target.value);
+                }}
             />
+            <span>{radius}</span>
+            <MapContainer center={[defaultLat, defaultLng]} zoom={8} scrollWheelZoom={true}>
+                <TileLayer
+                    attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
 
-            {fetchedPlaces.map((place) => {
-                let { $id, name, category, lat, lng } = place;
+                {fetchedPlaces.map((place) => {
+                    let { Id, name, categories, lat, lng } = place;
 
-                let icon = mapServices.getMarkerIcon(category);
+                    let icon = mapServices.getMarkerIcon();
 
-                return (
-                    <Marker key={$id} position={[lat, lng]} icon={icon}>
-                        <Popup>
-                            {name}
-                        </Popup>
-                    </Marker>
-                )
+                    return (
+                        <Marker
+                            key={Id}
+                            position={[lat, lng]}
+                            categories={categories}
+                            icon={icon}>
+                            <Popup>
+                                {name}
+                            </Popup>
+                        </Marker>
+                    )
 
-            })}
+                })}
 
-            <CurrentLocationMarker />
+                <CurrentLocationMarker getCurrentLocation={getCurrentLocationHandler} />
 
-        </MapContainer>
+
+
+            </MapContainer>
+
+        </>
     );
 }
 

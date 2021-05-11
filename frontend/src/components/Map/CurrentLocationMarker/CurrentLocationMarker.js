@@ -1,12 +1,17 @@
 import { Marker, Popup } from 'react-leaflet';
+import { useEffect } from 'react';
 
 import useGeolocation from '../../../hooks/useGeolocation'
 
-function CurrentLocationMarker() {
-    const currentPosition = useGeolocation();
+function CurrentLocationMarker({ getCurrentLocation }) {
+    const currentLocation = useGeolocation();
 
-    return currentPosition === null ? null : (
-        <Marker position={currentPosition}>
+    useEffect(() => {
+        getCurrentLocation(currentLocation);
+    }, [currentLocation])
+
+    return currentLocation === null ? null : (
+        <Marker position={currentLocation}>
             <Popup>You are here</Popup>
         </Marker>
     )

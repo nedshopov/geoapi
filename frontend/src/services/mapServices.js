@@ -1,6 +1,6 @@
 import L from 'leaflet'
 
-function getMarkerIcon(category) {
+function getMarkerIcon() {
     let myIcon = L.icon({
         iconUrl: 'map_pin_icon.svg.png',
         // iconSize: [38, 95],
