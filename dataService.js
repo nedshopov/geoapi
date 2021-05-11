@@ -50,8 +50,8 @@ class DataService {
             return
         }
 
-        const postProcess = categories ? filtersService.getFiltersPredicate(filters) : filtersService.getFirstResult
-        const query = withGeoFilters ? `call GETINRADIUS(${lat}, ${lng}, ${filters.radius})` : sql.Query()
+        const postProcess = categories ? filtersService.getFiltersPredicate(categories) : filtersService.getFirstResult
+        const query = withGeoFilters ? `call GETINRADIUS(${filters.lat}, ${filters.lng}, ${filters.radius})` : sql.Query()
             .select()
             .from(this.dbConfig.geoObjectsTable)
             .build()
