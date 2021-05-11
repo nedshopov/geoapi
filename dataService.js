@@ -25,6 +25,15 @@ class DataService {
         this.usePoolQuery(res, query)
     }
 
+    getCustom(res) {
+        const query = sql.Query()
+            .select()
+            .from(this.dbConfig.geoObjectsTable)
+            .where({ isCustom: 1 })
+            .build()
+        this.usePoolQuery(res, query)
+    }
+
     getById(res, id) {
         const query = sql.Query()
             .select()
@@ -57,6 +66,16 @@ class DataService {
             .build()
 
         this.usePoolQuery(res, query, postProcess)
+    }
+
+    add(res, parameters) {
+        const query = sql.Query()
+            .insert()
+            .into(this.dbConfig.geoObjectsTable)
+            .set({ name: parameters.name, categories: parameters.categories, lng: parameters.lng, lat: parameters.lat, isCustom: 1 })
+            .build()
+        console.log("query" + query)
+        this.usePoolQuery(res, query)
     }
 
     useConnection(res, sqlQuery) {

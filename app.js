@@ -5,6 +5,11 @@ const app = express()
 const port = process.env.PORT || 3000
 const dataService = new DataService()
 
+
+app.use(express.json());       // to support JSON-encoded bodies
+app.use(express.urlencoded()); // to support URL-encoded bodies
+
+
 app.get('/', (req, res) => {
     res.send("Hello world! ")
 })
@@ -25,6 +30,14 @@ app.get('/geoapi/filter/', (req, res) => {
     dataService.filter(res, req.query.categories, {
         lat: parseFloat(req.query.lat), lng: parseFloat(req.query.lng), radius: parseInt(req.query.radius)
     })
+})
+
+app.get('/geoapi/objects/custom', (req, res) => {
+    dataService.getCustom(res)
+})
+
+app.post('/geoapi/objects/add/', (req, res) => {
+    dataService.add(res, { lat: req.body.lat, lng: req.body.lng, name: req.body.name, categories: req.body.categories })
 })
 
 app.listen(port, () => console.log(`Listening on port ${port}...`))
