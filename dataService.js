@@ -1,11 +1,13 @@
 const mysql = require("mysql")
 const sql = require("sql-query")
 const dbConfigJson = require("./dbConfig.json")
+const FiltersService = require("./filtersService")
+const _ = require("lodash")
+const filtersService = new FiltersService()
 
 class DataService {
     constructor() {
         this.dbConfig = dbConfigJson
-        this.getFirstResult = (result) => { return result[0] }
         this.pool = mysql.createPool({
             connectionLimit: this.dbConfig.connectionLimit,
             host: this.dbConfig.host,
@@ -29,11 +31,32 @@ class DataService {
             .from(this.dbConfig.geoObjectsTable)
             .where({ id: id })
             .build()
-        this.usePoolQuery(res, query, this.getFirstResult)
+        this.usePoolQuery(res, query, filtersService.getFirstResult)
     }
 
     getInRange(res, lat, lng, radius) {
-        this.usePoolQuery(res, `call GETINRADIUS(${lat}, ${lng}, ${radius})`, this.getFirstResult)
+        if (lat === NaN || lng === NaN || radius === NaN) {
+            res.json({ "code": 100, "status": "Filters missing" })
+            return
+        }
+
+        this.usePoolQuery(res, `call GETINRADIUS(${lat}, ${lng}, ${radius})`, filtersService.getFirstResult)
+    }
+
+    filter(res, categories, filters) {
+        const withGeoFilters = (filters.lat || filters.lng || filters.radius)
+        if (withGeoFilters && (!filters.lat || !filters.lng || !filters.radius)) {
+            res.json({ "code": 100, "status": "Filters missing" })
+            return
+        }
+
+        const postProcess = categories ? filtersService.getFiltersPredicate(filters) : filtersService.getFirstResult
+        const query = withGeoFilters ? `call GETINRADIUS(${lat}, ${lng}, ${filters.radius})` : sql.Query()
+            .select()
+            .from(this.dbConfig.geoObjectsTable)
+            .build()
+
+        this.usePoolQuery(res, query, postProcess)
     }
 
     useConnection(res, sqlQuery) {
@@ -58,7 +81,7 @@ class DataService {
         })
     }
 
-    usePoolQuery(res, sqlQuery, cleanResult) {
+    usePoolQuery(res, sqlQuery, postProcess) {
         this.pool.query(sqlQuery, (err, rows) => {
             if (err) {
                 console.log(err)
@@ -68,7 +91,7 @@ class DataService {
             if (!rows) {
                 res.json("Nothing found")
             } else {
-                const result = cleanResult ? cleanResult(JSON.parse(JSON.stringify(rows))) : rows
+                const result = postProcess ? postProcess(JSON.parse(JSON.stringify(rows))) : rows
                 res.json(result)
             }
         })
