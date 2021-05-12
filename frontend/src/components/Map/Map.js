@@ -3,14 +3,14 @@ import { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import debounce from 'lodash/debounce';
 
-// SERVICES
-import mapServices from '../../services/mapServices';
-
 // CSS
 import style from './Map.module.css'
 
+// SERVICES
+import mapServices from '../../services/mapServices';
+
 // COMPONENTS
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
 import CurrentLocationMarker from './CurrentLocationMarker/CurrentLocationMarker';
 
 const defaultLat = 42.765833;
@@ -58,7 +58,6 @@ function Map() {
                 type="range"
                 min={0}
                 max={20}
-                placeholder="Set search radius"
                 value={radius}
                 name="radius"
                 id="radius"
@@ -93,9 +92,7 @@ function Map() {
 
                 })}
 
-                <CurrentLocationMarker getCurrentLocation={getCurrentLocationHandler} />
-
-
+                <CurrentLocationMarker getCurrentLocation={getCurrentLocationHandler} radius={radius} />
 
             </MapContainer>
 

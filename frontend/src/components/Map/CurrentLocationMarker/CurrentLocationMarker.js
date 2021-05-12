@@ -1,19 +1,23 @@
-import { Marker, Popup } from 'react-leaflet';
+import { Marker, Popup, Circle } from 'react-leaflet';
 import { useEffect } from 'react';
 
 import useGeolocation from '../../../hooks/useGeolocation'
 
-function CurrentLocationMarker({ getCurrentLocation }) {
+function CurrentLocationMarker({ getCurrentLocation, radius }) {
     const currentLocation = useGeolocation();
 
     useEffect(() => {
+        console.log(radius);
         getCurrentLocation(currentLocation);
     }, [currentLocation])
 
     return currentLocation === null ? null : (
-        <Marker position={currentLocation}>
-            <Popup>You are here</Popup>
-        </Marker>
+        <>
+            <Marker position={currentLocation}>
+                <Popup>You are here</Popup>
+            </Marker>
+            <Circle center={currentLocation} pathOptions={{ fillColor: 'blue', fillOpacity: 0.1, color: 'blue' }} radius={radius * 1000} />
+        </>
     )
 }
 
