@@ -1,6 +1,7 @@
 // LIBRARIES
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
+import debounce from 'lodash/debounce';
 
 // SERVICES
 import mapServices from '../../services/mapServices';
@@ -19,6 +20,7 @@ function Map() {
     const [fetchedPlaces, setFetchedPlaces] = useState([]);
     const [currentLocation, setCurrentLocation] = useState(null);
     const [radius, setRadius] = useState(0)
+    const [finalRadius, setFinalRadius] = useState(0)
 
     const proxy = 'https://cors-anywhere.herokuapp.com/';
     const baseURL = 'https://nedshopov.com/geoapi/';
@@ -26,6 +28,9 @@ function Map() {
     const getCurrentLocationHandler = (location) => {
         setCurrentLocation(location);
     }
+
+    const updateRadiusHandler = useCallback(debounce((radius) => setFinalRadius(radius)
+    , 1000), []);
 
     useEffect(() => {
         if (currentLocation !== null) {
@@ -43,7 +48,7 @@ function Map() {
                 .catch(err => console.log(err))
         }
 
-    }, [currentLocation, radius])
+    }, [currentLocation, finalRadius])
 
     return (
 
@@ -52,13 +57,14 @@ function Map() {
                 className={style.radiusInput}
                 type="range"
                 min={0}
-                max={50}
+                max={20}
                 placeholder="Set search radius"
                 value={radius}
                 name="radius"
                 id="radius"
                 onChange={(e) => {
-                    setRadius(e.target.value);
+                    setRadius(e.target.value)
+                    updateRadiusHandler(e.target.value)
                 }}
             />
             <span>{radius}</span>
