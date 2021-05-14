@@ -7,7 +7,6 @@ function CurrentLocationMarker({ getCurrentLocation, radius }) {
     const currentLocation = useGeolocation();
 
     useEffect(() => {
-        console.log(radius);
         getCurrentLocation(currentLocation);
     }, [currentLocation])
 
@@ -16,7 +15,7 @@ function CurrentLocationMarker({ getCurrentLocation, radius }) {
             <Marker position={currentLocation}>
                 <Popup>You are here</Popup>
             </Marker>
-            <Circle center={currentLocation} pathOptions={{ fillColor: 'blue', fillOpacity: 0.1, color: 'blue' }} radius={radius * 1000} />
+            <Circle center={currentLocation} pathOptions={{ fillColor: 'blue', fillOpacity: 0.15, stroke: false }} radius={radius * 1000} />
         </>
     )
 }
