@@ -59,11 +59,13 @@ class DataService {
             return
         }
 
-        const postProcess = categories ? filtersService.getFiltersPredicate(categories) : filtersService.getFirstResult
-        const query = withGeoFilters ? `call GETINRADIUS(${filters.lat}, ${filters.lng}, ${filters.radius})` : sql.Query()
-            .select()
-            .from(this.dbConfig.geoObjectsTable)
-            .build()
+        const postProcess = categories ? filtersService.getFiltersPredicate(categories, false) : undefined
+        const query = withGeoFilters
+            ? `call GETINRADIUS(${filters.lat}, ${filters.lng}, ${filters.radius})`
+            : sql.Query()
+                .select()
+                .from(this.dbConfig.geoObjectsTable)
+                .build()
 
         this.usePoolQuery(res, query, postProcess)
     }
