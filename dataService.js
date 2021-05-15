@@ -52,14 +52,14 @@ class DataService {
         this.usePoolQuery(res, `call GETINRADIUS(${lat}, ${lng}, ${radius})`, filtersService.getFirstResult)
     }
 
-    filter(res, categories, filters) {
+    filter(res, filters) {
         const withGeoFilters = (filters.lat || filters.lng || filters.radius)
         if (withGeoFilters && (!filters.lat || !filters.lng || !filters.radius)) {
             res.json({ "code": 100, "status": "Filters missing" })
             return
         }
 
-        const postProcess = filtersService.getFiltersPredicate(categories)
+        const postProcess = filtersService.getFiltersPredicate(filters.categories)
         const query = withGeoFilters
             ? `call GETINRADIUS(${filters.lat}, ${filters.lng}, ${filters.radius})`
             : sql.Query()

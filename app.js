@@ -7,10 +7,9 @@ const port = process.env.PORT || 3000
 const dataService = new DataService()
 
 
+app.use(cors());
 app.use(express.json());       // to support JSON-encoded bodies
 app.use(express.urlencoded()); // to support URL-encoded bodies
-app.use(cors());
-
 
 app.get('/', (req, res) => {
     res.send("Hello world! ")
@@ -29,9 +28,11 @@ app.get('/geoapi/getInRadius/', (req, res) => {
 })
 
 app.get('/geoapi/filter/', (req, res) => {
-    app.use(cors());
-    dataService.filter(res, req.query.categories, {
-        lat: parseFloat(req.query.lat), lng: parseFloat(req.query.lng), radius: parseInt(req.query.radius)
+    dataService.filter(res, {
+        categories: req.query.categories,
+        lat: parseFloat(req.query.lat),
+        lng: parseFloat(req.query.lng),
+        radius: parseInt(req.query.radius)
     })
 })
 
