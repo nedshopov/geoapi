@@ -59,7 +59,7 @@ class DataService {
             return
         }
 
-        const postProcess = categories ? filtersService.getFiltersPredicate(categories, false) : undefined
+        const postProcess = filtersService.getFiltersPredicate(categories)
         const query = withGeoFilters
             ? `call GETINRADIUS(${filters.lat}, ${filters.lng}, ${filters.radius})`
             : sql.Query()
