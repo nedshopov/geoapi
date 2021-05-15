@@ -1,6 +1,7 @@
 
 const DataService = require("./dataService")
 const express = require('express')
+const cors = require('cors');
 const app = express()
 const port = process.env.PORT || 3000
 const dataService = new DataService()
@@ -8,6 +9,7 @@ const dataService = new DataService()
 
 app.use(express.json());       // to support JSON-encoded bodies
 app.use(express.urlencoded()); // to support URL-encoded bodies
+app.use(cors());
 
 
 app.get('/', (req, res) => {
