@@ -29,6 +29,7 @@ app.get('/geoapi/getInRadius/', (req, res) => {
 })
 
 app.get('/geoapi/filter/', (req, res) => {
+    app.use(cors());
     dataService.filter(res, req.query.categories, {
         lat: parseFloat(req.query.lat), lng: parseFloat(req.query.lng), radius: parseInt(req.query.radius)
     })
